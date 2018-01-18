@@ -4,7 +4,10 @@ interface
 
 uses
   System.inifiles,
-  System.sysutils, vConst;
+  System.sysutils,
+  vConst,
+  System.IOUtils,
+  System.Types, bFormatter;
 
 type
 
@@ -27,6 +30,9 @@ type
       class function ConfFile: TIniFile;
       class function getConfig: String;
       class function currentPath: string;
+      class function Models: TStringDynArray;
+      class function Controllers: TStringDynArray;
+      class function DAOs: TStringDynArray;
     end;
 
   end;
@@ -86,9 +92,24 @@ begin
   result := 'Database Configuration:' + slinebreak + TEnv.DB.All;
 end;
 
+class function TEnv.System.Models: TStringDynArray;
+begin
+  result := TDirectory.getfiles(TEnv.System.currentPath + TConst.model);
+end;
+
+class function TEnv.System.Controllers: TStringDynArray;
+begin
+  result := TDirectory.getfiles(TEnv.System.currentPath + TConst.controller);
+end;
+
 class function TEnv.System.currentPath: string;
 begin
   result := GetCurrentDir + '\';
+end;
+
+class function TEnv.System.DAOs: TStringDynArray;
+begin
+  result := TDirectory.getfiles(TEnv.System.currentPath + TConst.DAO);
 end;
 
 class function TEnv.System.exePath: string;

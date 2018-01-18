@@ -61,6 +61,9 @@
         <DCC_RemoteDebug>true</DCC_RemoteDebug>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win32)'!=''">
+        <Debugger_CWD>D:\Spartan\Win32\Release</Debugger_CWD>
+        <Debugger_RunParams>push controller</Debugger_RunParams>
+        <Debugger_HostApplication>c:\windows\system32\cmd.exe</Debugger_HostApplication>
         <DCC_RemoteDebug>false</DCC_RemoteDebug>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
@@ -79,6 +82,7 @@
         <DCCReference Include="bin\bFile.pas"/>
         <DCCReference Include="DAO\dDB.pas"/>
         <DCCReference Include="bin\bFormatter.pas"/>
+        <DCCReference Include="bin\bHelper.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

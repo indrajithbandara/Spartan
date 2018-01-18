@@ -2,7 +2,7 @@ unit bSpartan;
 
 interface
 
-uses vEnv, vConst, bFile, system.SysUtils, system.StrUtils, firedac.comp.client, dDB, bFormatter;
+uses vEnv, vConst, bFile, system.SysUtils, system.StrUtils, firedac.comp.client, dDB, bFormatter, bHelper;
 
 type
   TSpartan = class
@@ -25,10 +25,10 @@ begin
   tfile.Create(dir);
   tfile.Create(dir + '\' + TCONST.CONF_FILE);
   tfile.writeInFile(dir + '\' + TCONST.CONF_FILE, '[database]' + slinebreak + tenv.DB.All + slinebreak + 'password=');
-  tfile.Create(dir + '\Controller\');
-  tfile.Create(dir + '\Model\');
-  tfile.Create(dir + '\DAO\');
-  tfile.Create(dir + '\View\');
+  tfile.Create(dir + TCONST.CONTROLLER);
+  tfile.Create(dir + TCONST.Model);
+  tfile.Create(dir + TCONST.DAO);
+  tfile.Create(dir + TCONST.View);
 end;
 
 class procedure TSpartan.spartError(msg: string);
@@ -47,6 +47,7 @@ class procedure TSpartan.raiseArmy;
 var
   i: integer;
   qry, qry_aux: tfdquery;
+  aName: string;
 begin
   case ParamCount of
     0:
@@ -121,13 +122,57 @@ begin
                     Writeln('Avaliable tables to became Model weapons: ');
                     while not qry.eof do
                     begin
-                      Writeln('       - ', tformatter.tableFromModel(qry.fields[0].asString));
+                      aName := tformatter.modelFromTable(qry.fields[0].asString);
+                      if thelper.existsInArray(tenv.system.currentPath + TCONST.Model + copy(aName, 2, length(aName)) + '.pas', tenv.system.Models) then
+                        Writeln('       - ', aName, StringOfChar(' ', 40 - length(aName)), '( Created )')
+
+                      else
+                        Writeln('       - ', aName, StringOfChar(' ', 40 - length(aName)), '( Not created )');
+
                       qry.next;
                     end;
                   end;
                 end;
               1: { controller }
-                Writeln('generate controller');
+                begin
+                  qry := tdb.execute('select table_name from information_schema.tables where table_schema = ?', [tenv.DB.database]);
+                  if qry <> nil then
+                  begin
+                    qry.first;
+                    Writeln('Avaliable tables to became Controller weapons: ');
+                    while not qry.eof do
+                    begin
+                      aName := tformatter.controllerFromTable(qry.fields[0].asString);
+                      if thelper.existsInArray(tenv.system.currentPath + TCONST.CONTROLLER + copy(aName, 2, length(aName)) + '.pas', tenv.system.Controllers) then
+                        Writeln('       - ', aName, StringOfChar(' ', 40 - length(aName)), '( Created )')
+
+                      else
+                        Writeln('       - ', aName, StringOfChar(' ', 40 - length(aName)), '( Not created )');
+
+                      qry.next;
+                    end;
+                  end;
+                end;
+              2: { DAO }
+                begin
+                  qry := tdb.execute('select table_name from information_schema.tables where table_schema = ?', [tenv.DB.database]);
+                  if qry <> nil then
+                  begin
+                    qry.first;
+                    Writeln('Avaliable tables to became DAO weapons: ');
+                    while not qry.eof do
+                    begin
+                      aName := tformatter.daoFromTable(qry.fields[0].asString);
+                      if thelper.existsInArray(tenv.system.currentPath + TCONST.DAO + copy(aName, 2, length(aName)) + '.pas', tenv.system.DAos) then
+                        Writeln('       - ', aName, StringOfChar(' ', 40 - length(aName)), '( Created )')
+
+                      else
+                        Writeln('       - ', aName, StringOfChar(' ', 40 - length(aName)), '( Not created )');
+
+                      qry.next;
+                    end;
+                  end;
+                end
             else
               spartError(format('Weapon "%s" is not part of our arsenal.', [ParamStr(2)]));
             end;
@@ -135,6 +180,17 @@ begin
           spartError(format('Soldier "%s" is not part of our army.', [ParamStr(1)]));
         end;
 
+      end;
+    3:
+      begin
+        case ansiindexstr(ParamStr(2), TCONST.push_options) of
+          0: { model }
+            ;
+          1: { controler }
+            ;
+        else
+          spartError(format('Weapon "%s" is not part of our arsenal.', [ParamStr(2)]));
+        end
       end;
   end;
 end;

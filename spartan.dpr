@@ -10,7 +10,8 @@ uses
   vConst in 'var\vConst.pas',
   bFile in 'bin\bFile.pas',
   dDB in 'DAO\dDB.pas',
-  bFormatter in 'bin\bFormatter.pas';
+  bFormatter in 'bin\bFormatter.pas',
+  bHelper in 'bin\bHelper.pas';
 
 begin
   try
