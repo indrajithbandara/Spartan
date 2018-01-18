@@ -4,7 +4,7 @@ interface
 
 uses
   System.inifiles,
-  System.sysutils;
+  System.sysutils, vConst;
 
 type
 
@@ -23,8 +23,10 @@ type
     System = class
     const
       Version = 'v1.0.0';
-      class function Path: string;
-      class function config: string;
+      class function exePath: string;
+      class function ConfFile: TIniFile;
+      class function getConfig: String;
+      class function currentPath: string;
     end;
 
   end;
@@ -35,48 +37,58 @@ implementation
 
 class function TEnv.DB.All: string;
 begin
-  result := 'Database Configuration:' + slinebreak + 'Driver: ' + TEnv.DB.Driver + slinebreak + 'Database: ' + TEnv.DB.Database + slinebreak + 'Server: ' + TEnv.DB.Server +
-    slinebreak + 'Port: ' + TEnv.DB.Port + slinebreak + 'User: ' + TEnv.DB.User;
+  result := 'driver=' + TEnv.DB.Driver + slinebreak + 'database=' + TEnv.DB.Database + slinebreak + 'server=' + TEnv.DB.Server + slinebreak + 'port=' + TEnv.DB.Port + slinebreak +
+    'user=' + TEnv.DB.User;
 end;
 
 class function TEnv.DB.Database: string;
 begin
-  result := Tinifile.create(TEnv.System.Path).readString('database', 'database', '');
+  result := TEnv.System.ConfFile.readString('database', 'database', '');
 end;
 
 class function TEnv.DB.Driver: string;
 begin
-  result := Tinifile.create(TEnv.System.Path).readString('database', 'driver', 'mysql');
+  result := TEnv.System.ConfFile.readString('database', 'driver', 'mysql');
 end;
 
 class function TEnv.DB.Password: string;
 begin
-  result := Tinifile.create(TEnv.System.Path).readString('database', 'password', '');
+  result := TEnv.System.ConfFile.readString('database', 'password', '');
 end;
 
 class function TEnv.DB.Port: string;
 begin
-  result := Tinifile.create(TEnv.System.Path).readString('database', 'port', '3306');
+  result := TEnv.System.ConfFile.readString('database', 'port', '3306');
 end;
 
 class function TEnv.DB.Server: string;
 begin
-  result := Tinifile.create(TEnv.System.Path).readString('database', 'port', 'localhost');
+  result := TEnv.System.ConfFile.readString('database', 'port', 'localhost');
 end;
 
 class function TEnv.DB.User: string;
 begin
-  result := Tinifile.create(TEnv.System.Path).readString('database', 'port', 'root');
+  result := TEnv.System.ConfFile.readString('database', 'port', 'root');
 end;
 
 { TEnv.System }
 
-class function TEnv.System.config: string;
+class function TEnv.System.ConfFile: TIniFile;
 begin
-  result := TEnv.DB.All;
+  result := TIniFile.Create(TConst.CONF_FILE);
 end;
 
-class function TEnv.System.Path: string;
+class function TEnv.System.getConfig: string;
+begin
+  result := 'Database Configuration:' + slinebreak + TEnv.DB.All;
+end;
+
+class function TEnv.System.currentPath: string;
+begin
+  result := GetCurrentDir + '\';
+end;
+
+class function TEnv.System.exePath: string;
 begin
   result := ExtractFilePath(ParamStr(0));
 end;
