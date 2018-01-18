@@ -2,7 +2,7 @@ unit bSpartan;
 
 interface
 
-uses vEnv, vConst, bFile, system.SysUtils, system.StrUtils;
+uses vEnv, vConst, bFile, system.SysUtils, system.StrUtils, firedac.comp.client, dDB, bFormatter;
 
 type
   TSpartan = class
@@ -24,7 +24,7 @@ class procedure TSpartan.raiseWeapons(dir: string);
 begin
   tfile.Create(dir);
   tfile.Create(dir + '\' + TCONST.CONF_FILE);
-  tfile.writeInFile(dir + '\' + TCONST.CONF_FILE, '[database]' + slinebreak + tenv.DB.All);
+  tfile.writeInFile(dir + '\' + TCONST.CONF_FILE, '[database]' + slinebreak + tenv.DB.All + slinebreak + 'password=');
   tfile.Create(dir + '\Controller\');
   tfile.Create(dir + '\Model\');
   tfile.Create(dir + '\DAO\');
@@ -46,6 +46,7 @@ end;
 class procedure TSpartan.raiseArmy;
 var
   i: integer;
+  qry, qry_aux: tfdquery;
 begin
   case ParamCount of
     0:
@@ -68,11 +69,13 @@ begin
       begin
         TSpartan.version;
         case ansiindexstr(ParamStr(1), TCONST.SOLDIERS) of
-          0:
+          0: { version already been promt }
             ;
           1: { -c }
             begin
-              Writeln('');
+
+              Writeln(format('Configuration file located in "%s"', [TCONST.getConfFile]));
+              Writeln('--------------------------------------------------------');
               Writeln(tenv.system.getConfig);
             end;
 
@@ -110,7 +113,19 @@ begin
           3: { push }
             case ansiindexstr(ParamStr(2), TCONST.push_options) of
               0: { model }
-                Writeln('list models');
+                begin
+                  qry := tdb.execute('select table_name from information_schema.tables where table_schema = ?', [tenv.DB.database]);
+                  if qry <> nil then
+                  begin
+                    qry.first;
+                    Writeln('Avaliable tables to became Model weapons: ');
+                    while not qry.eof do
+                    begin
+                      Writeln('       - ', tformatter.tableFromModel(qry.fields[0].asString));
+                      qry.next;
+                    end;
+                  end;
+                end;
               1: { controller }
                 Writeln('generate controller');
             else

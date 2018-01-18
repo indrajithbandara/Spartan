@@ -63,19 +63,22 @@ end;
 
 class function TEnv.DB.Server: string;
 begin
-  result := TEnv.System.ConfFile.readString('database', 'port', 'localhost');
+  result := TEnv.System.ConfFile.readString('database', 'server', 'localhost');
 end;
 
 class function TEnv.DB.User: string;
 begin
-  result := TEnv.System.ConfFile.readString('database', 'port', 'root');
+  result := TEnv.System.ConfFile.readString('database', 'user', 'root');
 end;
 
 { TEnv.System }
 
 class function TEnv.System.ConfFile: TIniFile;
 begin
-  result := TIniFile.Create(TConst.CONF_FILE);
+  if not fileexists(TConst.getConfFile) then
+    raise Exception.Create('Configuration file not found!' + slinebreak + ' Run "spartan stare ." to recriate file.');
+
+  result := TIniFile.Create(TConst.getConfFile);
 end;
 
 class function TEnv.System.getConfig: string;
