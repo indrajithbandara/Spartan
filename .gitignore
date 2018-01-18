@@ -1,0 +1,6 @@
+# Delphi local files
+__history/
+*.dproj.local
+*.res
+*.skincfg
+Win32/
