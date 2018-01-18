@@ -22,7 +22,7 @@ type
 
     System = class
     const
-      Version = 'v1.0.0';
+      Version = 'v1.0.1';
       class function exePath: string;
       class function ConfFile: TIniFile;
       class function getConfig: String;

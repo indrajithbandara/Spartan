@@ -68,6 +68,8 @@ begin
       begin
         TSpartan.version;
         case ansiindexstr(ParamStr(1), TCONST.SOLDIERS) of
+          0:
+            ;
           1: { -c }
             begin
               Writeln('');
