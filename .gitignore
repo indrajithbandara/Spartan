@@ -4,3 +4,4 @@ __history/
 *.res
 *.skincfg
 Win32/
+*.identcache
